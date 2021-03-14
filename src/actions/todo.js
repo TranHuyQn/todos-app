@@ -39,3 +39,10 @@ export const toggleAllTodo = (completed) => {
         payload: completed
     }
 }
+
+export const getListTodo = (todos) => {
+    return {
+        type: 'GET_TODOS',
+        payload: todos
+    }
+}

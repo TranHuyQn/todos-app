@@ -1,6 +1,8 @@
+import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { filterTodo, toggleAllTodo } from '../actions/todo';
+import { urlStore } from '../utils/Api';
 
 Footer.propTypes = {
 
@@ -22,6 +24,16 @@ function Footer(props) {
         setNumberOfItemLeft(calcNumberOfItemLeft())
     }, [todoList])
 
+    const clearCompleted = () => {
+        todoList.map(todo => {
+            if (todo.completed) {
+                todo.completed = false;
+                axios.put(`${urlStore}/${todo._id}`, todo);
+            }
+        });
+        dispatch(toggleAllTodo(false));
+    }
+
     return (
         // <!-- This footer should hidden by default and shown when there are todos -->
         < footer className="footer" >
@@ -40,7 +52,7 @@ function Footer(props) {
                 })}
             </ul>
             {/* <!-- Hidden if no completed items are left ↓ --> */}
-            {numberOfItemLeft < todoList.length ? <button onClick={() => dispatch(toggleAllTodo(false))} className="clear-completed" > Clear completed</button> : ''}
+            {numberOfItemLeft < todoList.length ? <button onClick={clearCompleted} className="clear-completed" > Clear completed</button> : ''}
         </footer >
     );
 }

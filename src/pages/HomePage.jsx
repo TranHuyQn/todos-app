@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleAllTodo } from '../actions/todo';
+import { getListTodo, toggleAllTodo } from '../actions/todo';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import TodoItem from '../components/TodoItem';
+import axios from 'axios';
+import { urlGetAll, urlStore } from '../utils/Api';
 
 HomePage.propTypes = {
 
@@ -16,8 +18,28 @@ function HomePage(props) {
     const filters = useSelector(state => state.todo.filters);
     const filter = useSelector(state => state.todo.filter);
     const toggleAll = (event) => {
+        todoList.map(todo => {
+            if (todo.completed != event.target.checked) {
+                todo.completed = event.target.checked
+                checkItem(todo)
+            }
+        });
         disPatch(toggleAllTodo(event.target.checked))
     }
+
+    const getTodos = () => {
+        axios.get(urlGetAll).then(res => {
+            disPatch(getListTodo(res.data));
+        })
+    }
+
+    const checkItem = (todo) => {
+        axios.put(`${urlStore}/${todo._id}`, todo)
+    }
+
+    useEffect(() => {
+        getTodos();
+    }, []);
 
     return (
         <section className="todoapp">
@@ -35,7 +57,7 @@ function HomePage(props) {
                 <ul className="todo-list">
                     {todoList.filter(filters[filter]).map(todo => {
                         return (
-                            <TodoItem key={todo.id} todo={todo}></TodoItem>
+                            <TodoItem key={todo._id} todo={todo}></TodoItem>
                         );
                     })}
                 </ul>

@@ -1,7 +1,8 @@
+import axios from 'axios';
 import React, { useState } from 'react'
 import { useDispatch } from 'react-redux';
-import uniqid from 'uniqid';
 import { addNewTodo } from '../actions/todo';
+import { urlStore } from '../utils/Api';
 
 Header.propTypes = {
 
@@ -12,14 +13,15 @@ function Header(props) {
     const handleEnterPress = (event) => {
         if (event.keyCode === 13 && event.target.value) {
             let todo = {
-                id: uniqid(),
                 name: event.target.value,
                 completed: false
             }
 
-            const action = addNewTodo(todo);
-            dispatch(action);
-            event.target.value = '';
+            axios.post(urlStore, todo).then(res => {
+                const action = addNewTodo(res.data);
+                dispatch(action);
+                event.target.value = '';
+            })
         }
     }
 
